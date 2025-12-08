@@ -5,11 +5,11 @@
 - 다양한 챌린지 참여와 매일 인증을 중심으로 `사용자의 꾸준한 성장을 돕는 기록형` 프로젝트입니다.
 - `Java`, `Spring Boot`기반으로 서버를 구현하고, `MySQL`로 db를 사용했습니다.
 - 개발은 초기 프로젝트 설정부터, db 생성 및 연결, 서버 연결, 프론트엔드 연결까지 `직접 구현`했습니다.
-- Model-View-Controllers 패턴으로 구현했습니다.
+- Spring MVC 기반의 계층형 아키텍처로 구현했습니다.
 
 ### 개발 인원 및 기간
 
-- 개발기간 :  2024-05-03 ~ 2024-05-29
+- 개발기간 :  2024-09-22 ~ 2024-12-07
 - 개발 인원 : 프론트엔드/백엔드 1명 (본인)
 
 ### 사용 기술 및 tools
@@ -28,39 +28,57 @@
   <div markdown="1">
     
       ├── README.md
-      ├── package-lock.json
-      ├── package.json
-      ├── app.js
-      ├── .prettierrc
-      ├── config
-      │    └── mysql.cjs
+      ├── common
+      │    ├── exception
+      │    │    ├── ApiException.java
+      │    │    ├── ErrorCode.java
+      │    │    └── GlobalExceptionHandler.java
+      │    └── response
+      │         ├── ApiResponse.java
+      │         └── ErrorResponse.java
+      ├── confing
+      │    ├── jwt
+      │    │    ├── CustomAccessDeniedHandler.java
+      │    │    ├── CustomAuthenticationEntrPoint.java
+      │    │    ├── JwtAuthenticationFilter.java
+      │    │    ├── JwtTokenProvider.java
+      │    │    └── UserPrincipal.java
+      │    └── SecurityConfig.java
       ├── controller
-      │    ├── comment-controller.cjs
-      │    ├── post-controller.cjs
-      │    └── user-controller.cjs
-      ├── images
-      │    ├── post/
-      │    └── profile/
-      ├── middleware
-      │    ├── authUser.cjs
-      │    └── validation.cjs
-      ├── model
-      │    ├── comments.cjs
-      │    ├── posts.cjs
-      │    └── users.cjs
-      ├── queries
-      │    ├── comments.cjs
-      │    ├── posts.cjs
-      │    └── users.cjs
-      ├── routes
-      │    ├── comment.cjs
-      │    ├── post.cjs
-      │    ├── user.cjs
-      │     postImage.cjs
-      │    └── profileImage.cjs
-      └── tools
-           ├── queryUtils.cjs
-           └── dataUtils.js
+      │    ├── AuthController.java
+      │    ├── ChallengeController.java
+      │    ├── PostController.java
+      │    └── UserController.java
+      ├── dto
+      │    ├── auth
+      │    ├── challenge
+      │    ├── post
+      │    └── user
+      ├── entity
+      │    ├── Challenge.java
+      │    ├── ChallengeCategory.java
+      │    ├── Participation.java
+      │    ├── Post.java
+      │    ├── PostLike.java
+      │    ├── RefreshToken.java
+      │    ├── Role.java
+      │    └── User.java
+      ├── repository
+      │    ├── ChallengeRepository.java
+      │    ├── ChallengeSummeraryProjection.java
+      │    ├── ParticipationRepository.java
+      │    ├── PostLikeRepository.java
+      │    ├── PostRepository.java
+      │    ├── RefreshTokenRepository.java
+      │    └── UserRepository.java
+      ├── service
+      │    ├── AuthService.java
+      │    ├── ChallengeService.java
+      │    ├── ParticipationService.java
+      │    ├── PostService.java
+      │    └── UserService.java
+      └── UpdateApiApplication.java
+
   </div>
 </details> 
 
@@ -68,13 +86,12 @@
 
 ## 서버 설계
 ### 서버 구조
-||route|controller|model|
-|:---|:---|:---|:---|
-|유저|userRouter|userController|userModel|
-|게시글|postRouter|postController|postModel|
-|댓글|commentRouter|commentController|commentModal|
-|게시글이미지|postImageRouter|-|-|
-|프로필이미지|profileImageRouter|-|-|
+||controller|service|repository|Entity|
+|:---|:---|:---|:---|:---|
+|유저|userController|userService|jserRepository|user|
+|챌린지|challengeController|challengeService|challengeRepository|challenge|
+|참여|-|participationService|participationRepository|participation|
+|포스트|postController|postService|postRepository, postLikeRepository|post, postLike|
 
 ### 구현 기능
 
@@ -84,19 +101,16 @@
 - 회원가입, 로그인, 비밀번호 변경 시 bcrypt로 비밀번호 암호화하여 처리
 - 세션을 통해 유저 정보 저장, 로그아웃/회원탈퇴 시 세션 destroy
 - 미들웨어를 통해 세션 정보가 있는 유저 요청만 처리
-- 프로필 이미지는 서버에 저장하고, DB에는 이미지 url 저장
+```
+
+#### Challenges
+```
+- 게시글 CRUD 기능 구현
 ```
 
 #### Posts
 ```
-- 게시글 CRUD 기능 구현
-- 미들웨어를 통해 세션 정보가 있는 유저 요청만 처리
-```
-
-#### Comments
-```
 - 댓글 CRUD 기능 구현
-- 미들웨어를 통해 세션 정보가 있는 유저 요청만 처리
 ```
 <br/>
 
@@ -132,11 +146,7 @@
 <br/>
 
 ## 프로젝트 후기
-사실 상 백엔드를 구현하는 것이 처음이라서 많이 낯설었습니다.  
-프론트엔드만 경험했던 저라서 어떻게 구조를 짜야하고 어떤 방식으로 코드를 짜야 효율적이고 클린한지 고민을 많이 했던 것 같습니다.  
-express로 서버를 만들고, MySQL로 Database를 만들어 연결하는 방식 또한 새로운 지식이어서 힘들었지만 하나하나 해내가며 프로젝트 완성에 가까워지니 재밌어했던 것 같습니다.  
-해당 프로젝트는 express로 구현을 했으니 추후 프로젝트에서는 SpringBoot를 사용해서 서버를 구현해보려고 합니다.  
-백엔드 공부를 열심히 해서 더욱 완성도 있는 프로젝트를 하겠습니다! 
+추후 작성..
 
 
 <br/>

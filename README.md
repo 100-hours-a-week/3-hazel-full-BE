@@ -36,7 +36,7 @@
       │    └── response
       │         ├── ApiResponse.java
       │         └── ErrorResponse.java
-      ├── confing
+      ├── config
       │    ├── jwt
       │    │    ├── CustomAccessDeniedHandler.java
       │    │    ├── CustomAuthenticationEntrPoint.java
